@@ -1,0 +1,12 @@
+#!/bin/bash -e
+
+base=$(dirname $0)
+root=$(readlink -f "${base}/..")
+makefile="${root}/Makefile"
+
+for config in $root/env/configs/*; do
+  echo -e "\e[96mBuilding $(basename $config)\e[0m"
+  cat env/common $config > $root/.config
+  make defconfig -f $makefile
+  ionice -c 3 nice -n19 make -j $(nproc) -f $makefile $*
+done
